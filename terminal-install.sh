@@ -30,6 +30,7 @@ cp dotfiles/zen.toml $OHMYPOSH_DIR/
 cp dotfiles/.zshrc $HOME/
 cp dotfiles/alacritty.toml $ALACRITTY_DIR/
 cp dotfiles/catppuccin-mocha.toml $ALACRITTY_DIR/
+sudo cp JetBrainsMono /usr/share/fonts/truetype/
 
 # Clone zsh plugins
 ZSH_PLUGINS=(
@@ -107,6 +108,9 @@ for plugin in "${PLUGINS[@]}"; do
     git clone https://github.com/$plugin "$PLUGIN_DIR/$plugin_name"
   fi
 done
+
+echo "reloading font cache"
+fc-cache -fv
 
 echo "installing tmux plugins..."
 $HOME/.tmux/plugins/tpm/scripts/install_plugins.sh
