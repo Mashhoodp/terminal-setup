@@ -2,7 +2,7 @@
 
 
 # Check if necessary packages are installed, if not install them
-for pkg in git zsh tmux curl xclip xsel alacritty batcat; do
+for pkg in git zsh tmux curl xclip xsel alacritty bat; do
   command -v $pkg >/dev/null 2>&1 || {
     echo "Installing $pkg..."
     sudo apt install -y $pkg
@@ -15,7 +15,7 @@ done
 ZSH_PLUGIN_DIR="$HOME/.config/zsh"
 TMUX_DIR="$HOME/.config/tmux"
 OHMYPOSH_DIR="$HOME/.config/ohmyposh"
-ALACRITTY_DIR="$HOME/.config/alacritty
+ALACRITTY_DIR="$HOME/.config/alacritty"
 
 # Create necessary directories
 mkdir -p $TMUX_DIR
@@ -30,7 +30,7 @@ cp dotfiles/zen.toml $OHMYPOSH_DIR/
 cp dotfiles/.zshrc $HOME/
 cp dotfiles/alacritty.toml $ALACRITTY_DIR/
 cp dotfiles/catppuccin-mocha.toml $ALACRITTY_DIR/
-sudo cp JetBrainsMono /usr/share/fonts/truetype/
+sudo cp -r JetBrainsMono /usr/share/fonts/truetype/
 
 # Clone zsh plugins
 ZSH_PLUGINS=(
@@ -54,7 +54,7 @@ done
 echo "installing oh-my-posh"
 # Download and install the latest release of oh-my-posh
 latest_release_info=$(curl -s https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | sed 's/[^[:print:]\t]//g')
-download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/[^"]*posh-linux-amd64')
+download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/[^"]*posh-linux-amd64' | head -n 1)
 curl -L -o oh-my-posh $download_url
 chmod +x oh-my-posh
 sudo mv oh-my-posh /usr/bin
