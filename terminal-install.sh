@@ -4,7 +4,7 @@
 # Check if necessary packages are installed, if not install them
 for pkg in git zsh tmux curl xclip xsel alacritty bat; do
   command -v $pkg >/dev/null 2>&1 || {
-    echo "Installing $pkg..."
+    echo "⚙️ Installing $pkg..."
     sudo apt install -y $pkg
   }
 done
@@ -14,25 +14,24 @@ done
 
 ZSH_PLUGIN_DIR="$HOME/.config/zsh"
 TMUX_DIR="$HOME/.config/tmux"
-OHMYPOSH_DIR="$HOME/.config/ohmyposh"
+STARSHIP_DIR="$HOME/.config"
 ALACRITTY_DIR="$HOME/.config/alacritty"
 
 # Create necessary directories
-mkdir -p $TMUX_DIR
-mkdir -p $OHMYPOSH_DIR
-mkdir -p $ZSH_PLUGIN_DIR
-mkdir -p $ALACRITTY_DIR
+echo "📂 Creating config directories..."
+mkdir -p $TMUX_DIR $ZSH_PLUGIN_DIR $ALACRITTY_DIR
 
 # Copy configuration files
-echo "Copying config files..."
+echo "📋 Copying dotfiles..."
 cp dotfiles/tmux.conf $TMUX_DIR/
-cp dotfiles/zen.toml $OHMYPOSH_DIR/
+cp dotfiles/starship.toml $STARSHIP_DIR/
 cp dotfiles/.zshrc $HOME/
 cp dotfiles/alacritty.toml $ALACRITTY_DIR/
 cp dotfiles/catppuccin-mocha.toml $ALACRITTY_DIR/
 sudo cp -r JetBrainsMono /usr/share/fonts/truetype/
 
 # Clone zsh plugins
+echo "🔌 Cloning Zsh plugins..."
 ZSH_PLUGINS=(
   "zsh-users/zsh-syntax-highlighting"
   "zsh-users/zsh-completions"
@@ -51,15 +50,11 @@ for plugin in "${ZSH_PLUGINS[@]}"; do
   fi
 done
 
-echo "installing oh-my-posh"
-# Download and install the latest release of oh-my-posh
-latest_release_info=$(curl -s https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | sed 's/[^[:print:]\t]//g')
-download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/[^"]*posh-linux-amd64' | head -n 1)
-curl -L -o oh-my-posh $download_url
-chmod +x oh-my-posh
-sudo mv oh-my-posh /usr/bin
+echo "🚀 Installing Starship..."
+curl -sS https://starship.rs/install.sh | sh
 
-echo "installing fzf"
+
+echo "🚀 installing fzf..."
 # Download and install the latest release of fzf
 latest_release_info=$(curl -s https://api.github.com/repos/junegunn/fzf/releases/latest | sed 's/[^[:print:]\t]//g')
 download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/junegunn/fzf/releases/download/[^"]*linux_amd64.tar.gz')
@@ -69,7 +64,7 @@ rm fzf.tar.gz
 chmod +x fzf
 sudo mv fzf /usr/bin
 
-echo "installing neovim"
+echo "🚀 installing neovim"
 # Download and install the latest release of neovim
 latest_release_info=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest)
 download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/neovim/neovim/releases/download/[^"]*nvim-linux64.tar.gz' | head -n 1)
@@ -79,7 +74,7 @@ sudo mv nvim-linux64 /opt/nvim
 sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
 rm nvim-linux64.tar.gz
 
-echo "Cloning nvchad"
+echo "📂 Cloning NVChad config.."
 # cloning NVchad configuration
 mkdir -p $HOME/.config/nvim
 sudo mkdir -p /root/.config
@@ -101,17 +96,17 @@ mkdir -p $PLUGIN_DIR
 for plugin in "${PLUGINS[@]}"; do
   plugin_name=$(basename $plugin)
   if [ -d "$PLUGIN_DIR/$plugin_name" ]; then
-    echo "Updating $plugin_name..."
+    echo "🔄 Updating $plugin_name..."
     git -C "$PLUGIN_DIR/$plugin_name" pull
   else
-    echo "Cloning $plugin_name..."
+    echo "📂 Cloning $plugin_name..."
     git clone https://github.com/$plugin "$PLUGIN_DIR/$plugin_name"
   fi
 done
 
-echo "reloading font cache"
+echo "🔄 Refreshing font cache...
 fc-cache -fv
 
-echo "installing tmux plugins..."
+echo "🔗 Installing Tmux plugins..."
 $HOME/.tmux/plugins/tpm/scripts/install_plugins.sh
-echo "installation completed. close the terminal"
+echo "🎉 All set! Restart your terminal to apply changes."

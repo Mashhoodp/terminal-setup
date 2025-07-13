@@ -9,7 +9,7 @@ autoload -Uz compinit && compinit
 
 
 # oh-my-posh initilisation
-eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/zen.toml)" 
+eval "$(starship init zsh )" 
 
 # Keybindings
 bindkey -e

@@ -1,0 +1,116 @@
+format = """
+[┌─](#88E788)\
+[](color_peach)\
+[ ](bg:color_peach fg:color_surface)\
+$username\
+[](bg:color_surface fg:color_peach)\
+$directory\
+[](fg:color_surface bg:color_aqua)\
+$git_branch\
+$git_status\
+[](fg:color_aqua bg:color_blue)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+[](fg:color_blue bg:color_bg3)\
+$python\
+$docker_context\
+$custom\
+[](fg:color_bg3 bg:color_bg1)\
+$time\
+[ ](fg:color_bg1)\
+\n[└─](#88E788)\
+$character"""
+
+palette = 'gruvbox_dark'
+
+[palettes.gruvbox_dark]
+color_fg0 = '#fbf1c7'
+color_bg1 = '#3c3836'
+color_bg3 = '#665c54'
+color_blue = '#89b4fa'
+color_aqua = '#689d6a'
+color_green = '#a6e3a1'
+color_peach = '#fab387'
+color_purple = '#b16286'
+color_red = '#cc241d'
+color_yellow = '#d79921'
+color_surface = '#313244'
+
+[username]
+show_always = true
+style_user = "bg:color_peach fg:color_surface"
+style_root = "bg:color_peach fg:color_surface"
+format = '[ $user ]($style)'
+
+[directory]
+style = "fg:color_fg0 bg:color_surface"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:color_aqua"
+format = '[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)'
+
+[git_status]
+style = "bg:color_aqua"
+format = '[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_surface bg:color_blue)]($style)'
+
+[c]
+symbol = " "
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_surface bg:color_blue)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_surface bg:color_blue)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_surface bg:color_blue)]($style)'
+
+[php]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_surface bg:color_blue)]($style)'
+
+
+[python]
+symbol = ""
+style = "bg:color_bg3"
+format = '[[ $symbol($virtual_env) ](fg:#cba6f7 bg:color_bg3)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:color_bg3"
+format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+
+[time]
+disabled= false
+time_format = "%I:%M %p"
+style = "bg:color_bg1"
+format = '[[  $time ](fg:color_fg0 bg:color_bg1)]($style)'
+
+[custom.tun0]
+command = "ip -4 addr show tun0 2>/dev/null | awk '/inet /{print $2}' | cut -d/ -f1"
+when = "true"
+style = "bg:color_bg3"
+format = "[[$output](fg:color_fg0 bg:color_bg3)]($style)"
