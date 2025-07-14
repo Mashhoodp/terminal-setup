@@ -104,9 +104,8 @@ for plugin in "${PLUGINS[@]}"; do
   fi
 done
 
-echo "🔄 Refreshing font cache...
 fc-cache -fv
 
-echo "🔗 Installing Tmux plugins..."
+echo "Installing Tmux plugins..."
 $HOME/.tmux/plugins/tpm/scripts/install_plugins.sh
 echo "🎉 All set! Restart your terminal to apply changes."
