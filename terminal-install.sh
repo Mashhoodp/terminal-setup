@@ -1,37 +1,139 @@
 #!/bin/bash
 
+# Exit on error
+set -e
 
-# Check if necessary packages are installed, if not install them
-for pkg in git zsh tmux curl xclip xsel alacritty bat; do
-  command -v $pkg >/dev/null 2>&1 || {
-    echo "⚙️ Installing $pkg..."
-    sudo apt install -y $pkg
-  }
-done
+# --- Helper Functions ---
+log() {
+    echo -e "\033[1;34m[INFO]\033[0m $1"
+}
 
-# Change shell to zsh if not already
-[ -z "$ZSH_VERSION" ] && sudo chsh -s $(which zsh) $USER
+warn() {
+    echo -e "\033[1;33m[WARN]\033[0m $1"
+}
 
+error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+
+# --- OS Detection ---
+log "🕵️ Detecting Operating System..."
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$ID
+    LIKE_OS=$ID_LIKE
+else
+    error "Cannot detect OS. Exiting."
+    exit 1
+fi
+
+# Define Package Lists
+# Common packages across distros
+COMMON_PKGS="git zsh tmux curl unzip fontconfig"
+
+# --- Installation Logic ---
+
+if [[ "$OS" == "arch" || "$LIKE_OS" == *"arch"* ]]; then
+    log "🚀 Arch Linux detected. Using pacman."
+    
+    # Arch packages (Arch repos are usually bleeding edge, so we can use repo versions for everything)
+    ARCH_PKGS="$COMMON_PKGS xclip xsel alacritty ghostty bat lazygit neovim fzf starship"
+    
+    sudo pacman -Syu --noconfirm
+    sudo pacman -S --needed --noconfirm $ARCH_PKGS
+
+elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; then
+    log "🛡️ Debian/Kali detected. Using apt."
+    
+    # Debian specific handling
+    # 'bat' is called 'batcat' in debian
+    # 'ghostty' might not be in repos yet, we try to install it but don't fail script if missing
+    DEB_PKGS="$COMMON_PKGS xclip xsel alacritty lazygit fzf"
+    
+    sudo apt update
+    sudo apt install -y $DEB_PKGS
+
+    # Handle Bat (Debian names it batcat)
+    if ! command -v batcat &> /dev/null; then
+        sudo apt install -y bat
+    fi
+    # Create alias for bat if it doesn't exist
+    mkdir -p ~/.local/bin
+    if command -v batcat &> /dev/null && ! command -v bat &> /dev/null; then
+        ln -sf /usr/bin/batcat ~/.local/bin/bat
+        export PATH=$HOME/.local/bin:$PATH
+    fi
+
+    # Handle Neovim (Debian repos often have ancient versions < 0.9, we need modern for lazygit/plugins)
+    log "🛠️ Installing latest stable Neovim for Debian (manual download)..."
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+    sudo rm -rf /opt/nvim
+    sudo tar -C /opt -xzf nvim-linux64.tar.gz
+    
+    # Update path linkage
+    sudo rm -f /usr/local/bin/nvim
+    sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim
+    rm nvim-linux64.tar.gz
+
+    # Handle Starship (Debian repos might be old)
+    if ! command -v starship &> /dev/null; then
+        log "🚀 Installing Starship via script..."
+        curl -sS https://starship.rs/install.sh | sh -s -- -y
+    fi
+
+    # Handle Ghostty (Try apt, warn if fail)
+    if sudo apt install -y ghostty 2>/dev/null; then
+        log "👻 Ghostty installed."
+    else
+        warn "Ghostty not found in apt repositories. You may need to build it manually or use a flatpak."
+    fi
+
+else
+    error "Unsupported OS: $OS"
+    exit 1
+fi
+
+# --- Configuration Setup ---
+
+# Directories
 ZSH_PLUGIN_DIR="$HOME/.config/zsh"
 TMUX_DIR="$HOME/.config/tmux"
 STARSHIP_DIR="$HOME/.config"
 ALACRITTY_DIR="$HOME/.config/alacritty"
+GHOSTTY_DIR="$HOME/.config/ghostty"
 
-# Create necessary directories
-echo "📂 Creating config directories..."
-mkdir -p $TMUX_DIR $ZSH_PLUGIN_DIR $ALACRITTY_DIR
+log "📂 Creating config directories..."
+mkdir -p "$TMUX_DIR" "$ZSH_PLUGIN_DIR" "$ALACRITTY_DIR" "$GHOSTTY_DIR"
 
-# Copy configuration files
-echo "📋 Copying dotfiles..."
-cp dotfiles/tmux.conf $TMUX_DIR/
-cp dotfiles/starship.toml $STARSHIP_DIR/
-cp dotfiles/.zshrc $HOME/
-cp dotfiles/alacritty.toml $ALACRITTY_DIR/
-cp dotfiles/catppuccin-mocha.toml $ALACRITTY_DIR/
-sudo cp -r JetBrainsMono /usr/share/fonts/truetype/
+# Check if dotfiles folder exists
+if [ -d "dotfiles" ]; then
+    log "📋 Copying dotfiles..."
+    [ -f dotfiles/tmux.conf ] && cp dotfiles/tmux.conf "$TMUX_DIR/"
+    [ -f dotfiles/starship.toml ] && cp dotfiles/starship.toml "$STARSHIP_DIR/"
+    [ -f dotfiles/.zshrc ] && cp dotfiles/.zshrc "$HOME/"
+    [ -f dotfiles/alacritty.toml ] && cp dotfiles/alacritty.toml "$ALACRITTY_DIR/"
+    # If you have ghostty config in dotfiles, uncomment below
+    # [ -f dotfiles/config ] && cp dotfiles/config "$GHOSTTY_DIR/" 
+    
+    # Copy fonts if they exist
+    if [ -d "JetBrainsMono" ]; then
+        log "fonts Installing Fonts..."
+        sudo cp -r JetBrainsMono /usr/share/fonts/truetype/
+        fc-cache -fv
+    fi
+else
+    warn "dotfiles/ directory not found in current path. Skipping config copy."
+fi
 
-# Clone zsh plugins
-echo "🔌 Cloning Zsh plugins..."
+# --- Zsh Setup ---
+
+# Change shell to zsh if not already
+if [ "$SHELL" != "$(which zsh)" ]; then
+    log "🐚 Changing default shell to Zsh..."
+    sudo chsh -s "$(which zsh)" "$USER"
+fi
+
+log "🔌 Setting up Zsh plugins..."
 ZSH_PLUGINS=(
   "zsh-users/zsh-syntax-highlighting"
   "zsh-users/zsh-completions"
@@ -40,50 +142,20 @@ ZSH_PLUGINS=(
 )
 
 for plugin in "${ZSH_PLUGINS[@]}"; do
-  plugin_name=$(basename $plugin)
+  plugin_name=$(basename "$plugin")
   if [ -d "$ZSH_PLUGIN_DIR/$plugin_name" ]; then
-    echo "Updating $plugin_name..."
+    log "Updating $plugin_name..."
     git -C "$ZSH_PLUGIN_DIR/$plugin_name" pull
   else
-    echo "Cloning $plugin_name..."
-    git clone https://github.com/$plugin "$ZSH_PLUGIN_DIR/$plugin_name"
+    log "Cloning $plugin_name..."
+    git clone "https://github.com/$plugin" "$ZSH_PLUGIN_DIR/$plugin_name"
   fi
 done
 
-echo "🚀 Installing Starship..."
-curl -sS https://starship.rs/install.sh | sh
+# --- Tmux Setup ---
 
-
-echo "🚀 installing fzf..."
-# Download and install the latest release of fzf
-latest_release_info=$(curl -s https://api.github.com/repos/junegunn/fzf/releases/latest | sed 's/[^[:print:]\t]//g')
-download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/junegunn/fzf/releases/download/[^"]*linux_amd64.tar.gz')
-curl -L -o fzf.tar.gz $download_url
-tar -xzf fzf.tar.gz
-rm fzf.tar.gz
-chmod +x fzf
-sudo mv fzf /usr/bin
-
-echo "🚀 installing neovim"
-# Download and install the latest release of neovim
-latest_release_info=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest)
-download_url=$(echo "$latest_release_info" | grep -o 'https://github.com/neovim/neovim/releases/download/[^"]*nvim-linux64.tar.gz' | head -n 1)
-curl -L -o nvim-linux64.tar.gz $download_url
-tar xzf nvim-linux64.tar.gz
-sudo mv nvim-linux64 /opt/nvim
-sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
-rm nvim-linux64.tar.gz
-
-echo "📂 Cloning NVChad config.."
-# cloning NVchad configuration
-mkdir -p $HOME/.config/nvim
-sudo mkdir -p /root/.config
-git clone https://github.com/NvChad/starter $HOME/.config/nvim
-sudo cp $HOME/.config/nvim /root/.config/
-
-# Define the plugin directory and tmux plugins
 PLUGIN_DIR="$HOME/.tmux/plugins"
-PLUGINS=(
+TMUX_PLUGINS=(
   "tmux-plugins/tpm"
   "tmux-plugins/tmux-sensible"
   "christoomey/vim-tmux-navigator"
@@ -91,21 +163,25 @@ PLUGINS=(
   "tmux-plugins/tmux-yank"
 )
 
-# Create plugin directory if it doesn't exist and clone/update plugins
-mkdir -p $PLUGIN_DIR
-for plugin in "${PLUGINS[@]}"; do
-  plugin_name=$(basename $plugin)
+log "💻 Setting up Tmux plugins..."
+mkdir -p "$PLUGIN_DIR"
+for plugin in "${TMUX_PLUGINS[@]}"; do
+  plugin_name=$(basename "$plugin")
   if [ -d "$PLUGIN_DIR/$plugin_name" ]; then
-    echo "🔄 Updating $plugin_name..."
+    log "Updating $plugin_name..."
     git -C "$PLUGIN_DIR/$plugin_name" pull
   else
-    echo "📂 Cloning $plugin_name..."
-    git clone https://github.com/$plugin "$PLUGIN_DIR/$plugin_name"
+    log "Cloning $plugin_name..."
+    git clone "https://github.com/$plugin" "$PLUGIN_DIR/$plugin_name"
   fi
 done
 
-fc-cache -fv
+# Install TPM plugins
+if [ -f "$PLUGIN_DIR/tpm/scripts/install_plugins.sh" ]; then
+    log "Running TPM install script..."
+    "$PLUGIN_DIR/tpm/scripts/install_plugins.sh"
+fi
 
-echo "Installing Tmux plugins..."
-$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh
-echo "🎉 All set! Restart your terminal to apply changes."
+# --- Cleanup & Finish ---
+
+log "🎉 All set! Please restart your terminal."
