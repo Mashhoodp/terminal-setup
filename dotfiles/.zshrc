@@ -3,6 +3,7 @@ source ~/.config/zsh/zsh-completions/src
 source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh/fzf-tab/fzf-tab.plugin.zsh
 source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+PROMPT_EOL_MARK=''
 
 # Load completions
 autoload -Uz compinit && compinit
@@ -38,14 +39,13 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
 # Aliases
 alias ls='ls --color'
-alias vim='nvim'
+alias vi='nvim'
 alias c='clear'
 alias e='exit'
 alias ll='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
 alias l='ls -CF'
-alias bat='batcat'
 
 # Shell integrations
 eval "$(fzf --zsh)"
