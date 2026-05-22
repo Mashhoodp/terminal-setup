@@ -29,7 +29,7 @@ fi
 
 # Define Package Lists
 # Common packages across distros
-COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim"
+COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim eza"
 
 # --- Installation Logic ---
 
