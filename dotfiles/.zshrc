@@ -38,14 +38,14 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
 # Aliases
-alias ls='ls --color'
+alias ls='eza --icons=always'
 alias vi='nvim'
 alias c='clear'
 alias e='exit'
-alias ll='ls -l'
-alias la='ls -a'
-alias lla='ls -la'
-alias l='ls -CF'
+alias ll='eza -l --icons=always'
+alias la='eza --icons=always -a'
+alias lla='eza --icons=always -la'
+alias t='tmux'
 
 # Shell integrations
 eval "$(fzf --zsh)"
