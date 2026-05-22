@@ -29,7 +29,7 @@ fi
 
 # Define Package Lists
 # Common packages across distros
-COMMON_PKGS="git zsh tmux curl unzip fontconfig"
+COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim"
 
 # --- Installation Logic ---
 
@@ -37,7 +37,7 @@ if [[ "$OS" == "arch" || "$LIKE_OS" == *"arch"* ]]; then
     log "🚀 Arch Linux detected. Using pacman."
     
     # Arch packages (Arch repos are usually bleeding edge, so we can use repo versions for everything)
-    ARCH_PKGS="$COMMON_PKGS xclip xsel alacritty ghostty bat lazygit neovim fzf starship"
+    ARCH_PKGS="$COMMON_PKGS xclip xsel alacritty ghostty bat lazygit fzf starship"
     
     sudo pacman -Syu --noconfirm
     sudo pacman -S --needed --noconfirm $ARCH_PKGS
@@ -64,16 +64,11 @@ elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; the
         export PATH=$HOME/.local/bin:$PATH
     fi
 
-    # Handle Neovim (Debian repos often have ancient versions < 0.9, we need modern for lazygit/plugins)
-    log "🛠️ Installing latest stable Neovim for Debian (manual download)..."
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
-    sudo rm -rf /opt/nvim
-    sudo tar -C /opt -xzf nvim-linux64.tar.gz
+    # Handle Lazyvim
+    log "🛠️ Installing lazyvim..."
+    git clone https://github.com/LazyVim/starter ~/.config/nvim
+    rm -rf ~/.config/nvim/.git
     
-    # Update path linkage
-    sudo rm -f /usr/local/bin/nvim
-    sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim
-    rm nvim-linux64.tar.gz
 
     # Handle Starship (Debian repos might be old)
     if ! command -v starship &> /dev/null; then
