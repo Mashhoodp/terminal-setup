@@ -66,7 +66,7 @@ elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; the
 
     # Handle Neovim (Debian repos often have ancient versions < 0.9, we need modern for lazygit/plugins)
     log "🛠️ Installing latest stable Neovim for Debian (manual download)..."
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
     sudo rm -rf /opt/nvim
     sudo tar -C /opt -xzf nvim-linux64.tar.gz
     
