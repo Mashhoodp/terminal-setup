@@ -29,7 +29,7 @@ fi
 
 # Define Package Lists
 # Common packages across distros
-COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim wl-clipboard xclip fzf lazygit"
+COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim wl-clipboard xclip fzf lazygit eza bat"
 
 # --- Installation Logic ---
 
@@ -37,7 +37,7 @@ if [[ "$OS" == "arch" || "$LIKE_OS" == *"arch"* ]]; then
   log "🚀 Arch Linux detected. Using pacman."
 
   # Arch packages
-  ARCH_PKGS="$COMMON_PKGS alacritty ghostty bat lazygit starship eza"
+  ARCH_PKGS="$COMMON_PKGS ghostty lazygit starship"
 
   sudo pacman -Syu --noconfirm
   sudo pacman -S --needed --noconfirm $ARCH_PKGS
@@ -46,7 +46,7 @@ elif [[ "$OS" == "fedora" || "$LIKE_OS" == *"fedora"* ]]; then
   log "🎩 Fedora detected. Using dnf."
 
   # Fedora packages
-  FEDORA_PKGS="$COMMON_PKGS bat eza"
+  FEDORA_PKGS="$COMMON_PKGS"
 
   sudo dnf upgrade -y
   sudo dnf install -y $FEDORA_PKGS
@@ -79,17 +79,6 @@ elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; the
 
   sudo apt update
   sudo apt install -y $DEB_PKGS
-
-  # Handle Bat (Debian names it batcat)
-  if ! command -v batcat &>/dev/null; then
-    sudo apt install -y bat
-  fi
-  # Create alias for bat if it doesn't exist
-  mkdir -p ~/.local/bin
-  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
-    ln -sf /usr/bin/batcat ~/.local/bin/bat
-    export PATH=$HOME/.local/bin:$PATH
-  fi
 
   # Handle Lazyvim
   if [ ! -d ~/.config/nvim ]; then
