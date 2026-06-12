@@ -29,7 +29,7 @@ fi
 
 # Define Package Lists
 # Common packages across distros
-COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim"
+COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim wl-clipboard xclip fzf lazygit"
 
 # --- Installation Logic ---
 
@@ -37,7 +37,7 @@ if [[ "$OS" == "arch" || "$LIKE_OS" == *"arch"* ]]; then
     log "🚀 Arch Linux detected. Using pacman."
     
     # Arch packages
-    ARCH_PKGS="$COMMON_PKGS xclip alacritty ghostty bat lazygit fzf starship eza"
+    ARCH_PKGS="$COMMON_PKGS alacritty ghostty bat lazygit starship eza"
     
     sudo pacman -Syu --noconfirm
     sudo pacman -S --needed --noconfirm $ARCH_PKGS
@@ -46,7 +46,7 @@ elif [[ "$OS" == "fedora" || "$LIKE_OS" == *"fedora"* ]]; then
     log "🎩 Fedora detected. Using dnf."
 
     # Fedora packages
-    FEDORA_PKGS="$COMMON_PKGS xclip alacritty bat lazygit fzf eza"
+    FEDORA_PKGS="$COMMON_PKGS bat eza"
 
     sudo dnf upgrade -y
     sudo dnf install -y $FEDORA_PKGS
@@ -75,7 +75,7 @@ elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; the
     
     # Debian specific handling
     # 'bat' is called 'batcat' in debian
-    DEB_PKGS="$COMMON_PKGS xclip alacritty lazygit fzf"
+    DEB_PKGS="$COMMON_PKGS alacritty"
     
     sudo apt update
     sudo apt install -y $DEB_PKGS
