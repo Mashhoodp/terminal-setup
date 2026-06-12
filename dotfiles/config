@@ -1,0 +1,15 @@
+theme = "Catppuccin Mocha"
+font-family = "JetBrainsMono Nerd Font"
+term = xterm-256color
+
+# ─────────────────────────────────────────────
+# Keybindings
+# ─────────────────────────────────────────────
+# Reload Config
+keybind = ctrl+r=reload_config
+# Ctrl+V pastes
+keybind = ctrl+v=paste_from_clipboard
+# Ctrl+shift+C sends SIGINT
+keybind = ctrl+shift+c=text:\x03
+# Ctrl+C copies
+keybind = ctrl+c=copy_to_clipboard
