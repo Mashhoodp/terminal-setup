@@ -24,8 +24,6 @@ It installs the following:
 
 ```bash
 git clone https://github.com/Mashhoodp/terminal-setup
-cd terminal-setup
-chmod +x terminal-install.sh
-./terminal-install.sh
+./terminal-setup.terminal-install.sh
 ```
 
