@@ -36,18 +36,46 @@ COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim eza"
 if [[ "$OS" == "arch" || "$LIKE_OS" == *"arch"* ]]; then
     log "🚀 Arch Linux detected. Using pacman."
     
-    # Arch packages (Arch repos are usually bleeding edge, so we can use repo versions for everything)
+    # Arch packages
     ARCH_PKGS="$COMMON_PKGS xclip xsel alacritty ghostty bat lazygit fzf starship"
     
     sudo pacman -Syu --noconfirm
     sudo pacman -S --needed --noconfirm $ARCH_PKGS
+
+elif [[ "$OS" == "fedora" || "$LIKE_OS" == *"fedora"* ]]; then
+    log "🎩 Fedora detected. Using dnf."
+
+    # Fedora packages
+    FEDORA_PKGS="$COMMON_PKGS xclip xsel alacritty bat lazygit fzf"
+
+    sudo dnf upgrade -y
+    sudo dnf install -y $FEDORA_PKGS
+
+    # Handle Ghostty and Starship (via COPR and atim)
+    log "👻 Installing Ghostty via COPR..."
+    # Ensure core plugins are installed for the 'copr' command
+    sudo dnf install -y dnf-plugins-core
+    sudo dnf copr enable scottames/ghostty -y
+    sudo dnf install -y ghostty
+    log "🚀 Installing Starship..."
+    sudo dnf copr enable atim/starship -y
+    sudo dnf install -y starship
+fi
+
+    # Handle Lazyvim
+    if [ ! -d ~/.config/nvim ]; then
+        log "🛠️ Installing lazyvim..."
+        git clone https://github.com/LazyVim/starter ~/.config/nvim
+        rm -rf ~/.config/nvim/.git
+    else
+        log "🛠️ Lazyvim already installed, skipping..."
+    fi
 
 elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; then
     log "🛡️ Debian/Kali detected. Using apt."
     
     # Debian specific handling
     # 'bat' is called 'batcat' in debian
-    # 'ghostty' might not be in repos yet, we try to install it but don't fail script if missing
     DEB_PKGS="$COMMON_PKGS xclip xsel alacritty lazygit fzf"
     
     sudo apt update
@@ -65,9 +93,13 @@ elif [[ "$OS" == "debian" || "$OS" == "kali" || "$LIKE_OS" == *"debian"* ]]; the
     fi
 
     # Handle Lazyvim
-    log "🛠️ Installing lazyvim..."
-    git clone https://github.com/LazyVim/starter ~/.config/nvim
-    rm -rf ~/.config/nvim/.git
+    if [ ! -d ~/.config/nvim ]; then
+        log "🛠️ Installing lazyvim..."
+        git clone https://github.com/LazyVim/starter ~/.config/nvim
+        rm -rf ~/.config/nvim/.git
+    else
+        log "🛠️ Lazyvim already installed, skipping..."
+    fi
     
 
     # Handle Starship (Debian repos might be old)
@@ -107,8 +139,7 @@ if [ -d "dotfiles" ]; then
     [ -f dotfiles/starship.toml ] && cp dotfiles/starship.toml "$STARSHIP_DIR/"
     [ -f dotfiles/.zshrc ] && cp dotfiles/.zshrc "$HOME/"
     [ -f dotfiles/alacritty.toml ] && cp dotfiles/alacritty.toml "$ALACRITTY_DIR/"
-    # If you have ghostty config in dotfiles, uncomment below
-    # [ -f dotfiles/config ] && cp dotfiles/config "$GHOSTTY_DIR/" 
+    [ -f dotfiles/config ] && cp dotfiles/config "$GHOSTTY_DIR/" 
     
     # Copy fonts if they exist
     if [ -d "JetBrainsMono" ]; then
