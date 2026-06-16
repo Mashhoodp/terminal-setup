@@ -29,7 +29,7 @@ fi
 
 # Define Package Lists
 # Common packages across distros
-COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim wl-clipboard xclip fzf lazygit eza bat"
+COMMON_PKGS="git zsh tmux curl unzip fontconfig neovim wl-clipboard xclip fzf eza bat"
 
 # --- Installation Logic ---
 
@@ -60,6 +60,7 @@ elif [[ "$OS" == "fedora" || "$LIKE_OS" == *"fedora"* ]]; then
   log "🚀 Installing Starship..."
   sudo dnf copr enable atim/starship -y
   sudo dnf install -y starship
+  
 
   # Handle Lazyvim
   if [ ! -d ~/.config/nvim ]; then
