@@ -73,6 +73,11 @@ flatpak install -y flathub io.missioncenter.MissionCenter com.mattjakeman.Extens
 echo
 echo "==> Configuring GNOME..."
 
+# Add dark mode to enviromental variables
+mkdir -p ~/.config/environment.d
+echo "GTK_THEME=Adwaita:dark" > ~/.config/environment.d/gtk-theme.conf
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
 # Enable minimize and maximize buttons
 gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
 
