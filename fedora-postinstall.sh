@@ -33,7 +33,7 @@ sudo dnf install --nogpgcheck -y \
 
 echo
 echo "==> Installing essential packages..."
-sudo dnf install -y fuse-libs gnome-tweaks fastfetch openh264 gstreamer1-plugin-openh264
+sudo dnf install -y fuse-libs gnome-tweaks fastfetch openh264 gstreamer1-plugin-openh264 adw-gtk3-theme
 
 echo "==> Installing Virtualization Support"
 sudo dnf install @Virtualization -y
@@ -72,11 +72,6 @@ flatpak install -y flathub io.missioncenter.MissionCenter com.mattjakeman.Extens
 
 echo
 echo "==> Configuring GNOME..."
-
-# Add dark mode to enviromental variables
-mkdir -p ~/.config/environment.d
-echo "GTK_THEME=Adwaita:dark" > ~/.config/environment.d/gtk-theme.conf
-gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 
 # Enable minimize and maximize buttons
 gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
