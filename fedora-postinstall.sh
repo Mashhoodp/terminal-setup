@@ -36,7 +36,7 @@ echo "==> Installing essential packages..."
 sudo dnf install -y fuse-libs gnome-tweaks fastfetch openh264 gstreamer1-plugin-openh264 adw-gtk3-theme
 
 echo "==> Installing Virtualization Support"
-sudo dnf install @Virtualization -y
+sudo dnf install @virtualization -y
 sudo usermod -aG libvirt $USER
 
 echo "==> Adding Brave Browser repository..."
