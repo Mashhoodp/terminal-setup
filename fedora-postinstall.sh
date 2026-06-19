@@ -43,7 +43,7 @@ echo "==> Adding Brave Browser repository..."
 sudo dnf config-manager addrepo --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 echo "==> Installing Brave Origin Browser..."
-sudo dnf install brave-origin
+sudo dnf install -y brave-origin
 
 echo
 echo "==> Detecting GPU..."
